@@ -15,7 +15,16 @@ export default function Step2() {
 	useEffect(() => {
 		allSelects.map((singleSelect) => {
 			if (singleSelect.value == infosStep3.answer) {
-				setTranslateAnswer(singleSelect.name);
+				// const result = getCountryFromName(singleSelect.name);
+				fetch(`https://api.nationalize.io/?name=${singleSelect.name.split(' ')[0]}`)
+					.then((resp) => resp.json())
+					.then(function (json) {
+						let countryPossibility = ``;
+						if (json['country'].length > 0) {
+							countryPossibility = ` provavelmente é de ${json['country'][0]['country_id']}`;
+						}
+						setTranslateAnswer(`${singleSelect.name}${countryPossibility}`);
+					});
 			}
 		});
 		if (infosStep2.radio == 'yes') {
@@ -30,7 +39,7 @@ export default function Step2() {
 		if (infosStep2.resp2 == 'no') {
 			setTranslateResp2('Não');
 		}
-	}, []);
+	}, [allSelects, infosStep2.radio, infosStep2.resp2, infosStep3.answer]);
 
 	const resetAll = useStoreActions((action) => action.resetAll);
 	function handleResetAnswers() {
